@@ -5,8 +5,7 @@ from os import path
 import shutil
 import time
 
-print("Hello!\nWelcome to FileSort 2.0.\nPlease set up folder associations in the following format:\n .extension folder\subfolder\etc \nExample: \n .zip Archives\Zip\nIf you want to put your folders somwhere, add 'dir folder\subfolder\etc' to the list.\nWhen you are done, type 'sort' to start the sorting process.")
-strIn = ""
+print("Hello!\nWelcome to FileSort 2.0.\nPlease set up folder associations in the following format:\n .extension folder\subfolder\etc \nExample: \n .zip Archives\Zip\nIf you want to put your folders somewhere, add 'dir folder\subfolder\etc' to the list.\nIf you want all unsorted to be moved to some folder, use the '*' key.\nWhen you are done, type 'sort' to start the sorting process.")
 
 i = 0
 associations = dict()
@@ -52,7 +51,7 @@ print("Sorting in progress...")
 
 for i in range(len(folderlist)):
     if not os.path.exists(cdir+"\\"+folderlist[i]):
-        os.mkdir(cdir+"\\"+folderlist[i])
+        os.makedirs(cdir+"\\"+folderlist[i])
         print("Directory ", folderlist[i],  " created ")
     else:    
         print("Directory ", folderlist[i],  " already exists")
@@ -72,7 +71,15 @@ for i in range(len(onlyfiles)):
     except IOError:
         print("Cannot move file",onlyfiles[i])
     except KeyError:
-        print("No association for file",onlyfiles[i]+", skipping")
+        if (associations.get("*") == None):
+            print("No association for file",onlyfiles[i]+", skipping")
+        else:
+            try:
+                print("Moving file",onlyfiles[i],"to",cdir+"\\"+associations["*"])
+                shutil.move(cdir+"\\"+onlyfiles[i], cdir+"\\"+associations["*"]+"\\"+onlyfiles[i])
+            except IOError:
+                print("Cannot move file",onlyfiles[i])
+            
 
 print("\nCleaning...")
 for i in range(len(folderlist)):

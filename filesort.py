@@ -5,14 +5,38 @@ from os import path
 import shutil
 import time
 
-print("Hello!\nWelcome to FileSort 2.0.\nPlease set up folder associations in the following format:\n .extension folder\subfolder\etc \nExample: \n .zip Archives\Zip\nIf you want to put your folders somewhere, add 'dir folder\subfolder\etc' to the list.\nIf you want all unsorted to be moved to some folder, use the '*' key.\nWhen you are done, type 'sort' to start the sorting process.")
+print("Hello!\nWelcome to FileSort 2.2.\nType 'load' to load existing configuration, 'noload' to configure the program manually or 'exit' to close the program.")
 
 i = 0
 associations = dict()
 exts = set()
 folders = set()
-
+noload = False
 while True:
+    temp0 = input()
+    if temp0 == "load":
+        try:
+            fo = open("extensions.cfg", "r")
+            lines = fo.read().splitlines()
+            for i in range(len(lines)):
+                temp = lines[i].split(' ')
+                associations[temp[0]] = temp[1]
+            fo.close()
+            print("Configuration loaded succesfully.")
+        except IOError:
+            print("Could not read 'extensions.cfg', please configure associations manually.")
+            noload = True
+            time.sleep(1)
+            print("Please set up folder associations in the following format:\n .extension folder\subfolder\etc \nExample: \n .zip Archives\Zip\nIf you want to put your folders somwhere, add 'dir folder\subfolder\etc' to the list.\nWhen you are done, type 'sort' to start the sorting process.")
+            break
+        break
+    if temp0 == "exit":
+        exit()
+    if temp0 == "noload":
+        noload = True
+        break
+    
+while noload:
     data = input()
     if data == "sort":
         break
@@ -82,9 +106,12 @@ for i in range(len(onlyfiles)):
             
 
 print("\nCleaning...")
-for i in range(len(folderlist)):
-    if not os.listdir(cdir+"\\"+folderlist[i]):
-        os.rmdir(cdir+"\\"+folderlist[i])
+try:
+    for i in range(len(folderlist)):
+        if not os.listdir(cdir+"\\"+folderlist[i]):
+            os.rmdir(cdir+"\\"+folderlist[i])
+except FileNotFoundError:
+    print("Error while cleaning empty folders, aborting...")
 
 print("\nDone!")
 time.sleep(5)
